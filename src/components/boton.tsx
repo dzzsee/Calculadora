@@ -24,11 +24,14 @@ const styles = StyleSheet.create({
   boton: {
     flex: 1,
     aspectRatio: 1,
-    borderRadius: 999,
+    borderRadius: 22,
+    borderWidth: 3,
+    borderColor: "#000",
     alignItems: "center",
     justifyContent: "center",
   },
   texto: {
-    fontSize: 36,
+    fontSize: 34,
+    fontWeight: "900",
   },
 });

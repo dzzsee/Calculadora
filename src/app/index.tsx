@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native";
+import Cabecera from "../components/cabecera";
 import Pantalla from "../components/pantalla";
 import Teclado from "../components/teclado";
 import type { Operador } from "../tipos";
@@ -137,6 +138,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.contenedor}>
+      <Cabecera />
       <Pantalla arriba={arriba} grande={pantalla} />
       <Teclado
         onNumero={pulsarNumero}
@@ -158,6 +160,6 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 400,
     alignSelf: "center",
-    backgroundColor: "#000",
+    backgroundColor: "#F5F1E6",
   },
 });

@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
-// Componente de presentación: solo muestra el texto de arriba y el número grande
+// Componente de presentación: muestra el texto de arriba y el número grande
+// dentro de un globo de cómic con borde negro
 export default function Pantalla({
   arriba,
   grande,
@@ -9,7 +10,7 @@ export default function Pantalla({
   grande: string;
 }) {
   return (
-    <View style={styles.pantalla}>
+    <View style={styles.globo}>
       <Text style={styles.arriba} numberOfLines={1}>
         {arriba}
       </Text>
@@ -21,20 +22,26 @@ export default function Pantalla({
 }
 
 const styles = StyleSheet.create({
-  pantalla: {
+  globo: {
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "flex-end",
-    padding: 24,
+    margin: 16,
+    padding: 8,
+    borderRadius: 28,
+    borderWidth: 4,
+    borderColor: "#000",
+    backgroundColor: "#FFF",
   },
   arriba: {
-    color: "#A5A5A5",
-    fontSize: 28,
+    color: "#555",
+    fontSize: 18,
+    fontWeight: "700",
     marginBottom: 4,
   },
   grande: {
-    color: "#FFF",
-    fontSize: 96,
-    fontWeight: "200",
+    color: "#000",
+    fontSize: 60,
+    fontWeight: "900",
   },
 });
