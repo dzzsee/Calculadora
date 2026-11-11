@@ -1,21 +1,31 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-// Componente de presentación: solo muestra un botón.
-// No sabe qué hace; recibe el texto, los colores y la función al pulsar.
 export default function Boton({
   texto,
   fondo,
   colorTexto,
+  alto,
+  tamañoTexto,
   onPress,
 }: {
   texto: string;
   fondo: string;
   colorTexto: string;
+  alto: number;
+  tamañoTexto: number;
   onPress: () => void;
 }) {
   return (
-    <Pressable onPress={onPress} style={[styles.boton, { backgroundColor: fondo }]}>
-      <Text style={[styles.texto, { color: colorTexto }]}>{texto}</Text>
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.boton,
+        { backgroundColor: fondo, height: alto, borderRadius: alto * 0.26 },
+      ]}
+    >
+      <Text style={[styles.texto, { color: colorTexto, fontSize: tamañoTexto }]}>
+        {texto}
+      </Text>
     </Pressable>
   );
 }
@@ -23,15 +33,12 @@ export default function Boton({
 const styles = StyleSheet.create({
   boton: {
     flex: 1,
-    aspectRatio: 1,
-    borderRadius: 22,
     borderWidth: 3,
     borderColor: "#000",
     alignItems: "center",
     justifyContent: "center",
   },
   texto: {
-    fontSize: 34,
     fontWeight: "900",
   },
 });

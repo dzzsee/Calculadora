@@ -1,2 +1,6 @@
-// Los únicos operadores que existen. TypeScript solo deja usar estos cuatro textos
-export type Operador = "+" | "−" | "×" | "÷";
+export type ConfigBoton<A> = {
+  texto: string;
+  fondo: string;
+  colorTexto: string;
+  accion: A;
+};

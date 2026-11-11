@@ -1,166 +1,44 @@
 import { StyleSheet, View } from "react-native";
-import type { Operador } from "../tipos";
+import type { ConfigBoton } from "../tipos";
 import Boton from "./boton";
 
-// Colores estilo Snoopy
-const BLANCO = "#FFFFFF";
-const NEGRO = "#000000";
-const ROJO = "#D62828"; // casita de Snoopy
-const AMARILLO = "#FFD23F"; // Woodstock
-const AZUL = "#2A6FDB"; // el igual
-
-// Componente de presentación: solo dibuja las teclas.
-// Las funciones que llegan por props son las que hace index.tsx.
-export default function Teclado({
-  onNumero,
-  onOperador,
-  onAC,
-  onBorrar,
-  onPorcentaje,
-  onSigno,
-  onPunto,
-  onIgual,
+export default function Teclado<A>({
+  filas,
+  onAccion,
+  espacio,
+  altoBoton,
+  textoBoton,
 }: {
-  onNumero: (numero: string) => void;
-  onOperador: (operador: Operador) => void;
-  onAC: () => void;
-  onBorrar: () => void;
-  onPorcentaje: () => void;
-  onSigno: () => void;
-  onPunto: () => void;
-  onIgual: () => void;
+  filas: ConfigBoton<A>[][];
+  onAccion: (accion: A) => void;
+  espacio: number;
+  altoBoton: number;
+  textoBoton: number;
 }) {
   return (
-    <View style={styles.teclado}>
-      <View style={styles.fila}>
-        <Boton
-          texto="⌫"
-          fondo={AMARILLO}
-          colorTexto={NEGRO}
-          onPress={onBorrar}
-        />
-        <Boton texto="AC" fondo={AMARILLO} colorTexto={NEGRO} onPress={onAC} />
-        <Boton
-          texto="%"
-          fondo={AMARILLO}
-          colorTexto={NEGRO}
-          onPress={onPorcentaje}
-        />
-        <Boton
-          texto="÷"
-          fondo={ROJO}
-          colorTexto={BLANCO}
-          onPress={() => onOperador("÷")}
-        />
-      </View>
-      <View style={styles.fila}>
-        <Boton
-          texto="7"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("7")}
-        />
-        <Boton
-          texto="8"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("8")}
-        />
-        <Boton
-          texto="9"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("9")}
-        />
-        <Boton
-          texto="+"
-          fondo={ROJO}
-          colorTexto={BLANCO}
-          onPress={() => onOperador("×")}
-        />
-      </View>
-      <View style={styles.fila}>
-        <Boton
-          texto="4"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("4")}
-        />
-        <Boton
-          texto="5"
-          fondo={ROJO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("5")}
-        />
-        <Boton
-          texto="6"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("6")}
-        />
-        <Boton
-          texto="−"
-          fondo={ROJO}
-          colorTexto={BLANCO}
-          onPress={() => onOperador("+")}
-        />
-      </View>
-      <View style={styles.fila}>
-        <Boton
-          texto="1"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("1")}
-        />
-        <Boton
-          texto="2"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("2")}
-        />
-        <Boton
-          texto="3"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("3")}
-        />
-        <Boton
-          texto="+"
-          fondo={ROJO}
-          colorTexto={BLANCO}
-          onPress={() => onOperador("+")}
-        />
-      </View>
-      <View style={styles.fila}>
-        <Boton
-          texto="+/-"
-          fondo={AMARILLO}
-          colorTexto={NEGRO}
-          onPress={onSigno}
-        />
-        <Boton
-          texto="0"
-          fondo={BLANCO}
-          colorTexto={NEGRO}
-          onPress={() => onNumero("0")}
-        />
-        <Boton texto="." fondo={BLANCO} colorTexto={NEGRO} onPress={onPunto} />
-        <Boton texto="=" fondo={AZUL} colorTexto={BLANCO} onPress={onIgual} />
-      </View>
-      <View style={styles.fila}>
-        <Boton texto="C" fondo={AMARILLO} colorTexto={NEGRO} onPress={onAC} />
-      </View>
+    <View style={[styles.teclado, { padding: espacio, gap: espacio }]}>
+      {filas.map((fila, i) => (
+        <View key={i} style={[styles.fila, { gap: espacio }]}>
+          {fila.map((boton, j) => (
+            <Boton
+              key={j}
+              texto={boton.texto}
+              fondo={boton.fondo}
+              colorTexto={boton.colorTexto}
+              alto={altoBoton}
+              tamañoTexto={textoBoton}
+              onPress={() => onAccion(boton.accion)}
+            />
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  teclado: {
-    padding: 16,
-    gap: 12,
-  },
+  teclado: {},
   fila: {
     flexDirection: "row",
-    gap: 12,
   },
 });

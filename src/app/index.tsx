@@ -1,26 +1,83 @@
 import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useMedidas } from "../hooks/use-medidas";
 import Cabecera from "../components/cabecera";
 import Pantalla from "../components/pantalla";
 import Teclado from "../components/teclado";
-import type { Operador } from "../tipos";
+import type { ConfigBoton } from "../tipos";
 
-// Esta pantalla es el "contenedor": guarda el estado y la lógica,
-// y se lo pasa a los componentes de presentación por props.
+const VALOR_INICIAL = "0";
+
+const BLANCO = "#FFFFFF";
+const NEGRO = "#000000";
+const ROJO = "#D62828";
+const AMARILLO = "#FFD23F";
+const AZUL = "#2A6FDB";
+
+const OPERACIONES = {
+  "+": (a: number, b: number) => a + b,
+  "−": (a: number, b: number) => a - b,
+  "×": (a: number, b: number) => a * b,
+  "÷": (a: number, b: number) => a / b,
+};
+
+type Operador = keyof typeof OPERACIONES;
+type Accion =
+  | { tipo: "numero"; valor: string }
+  | { tipo: "operador"; valor: Operador }
+  | { tipo: "igual" }
+  | { tipo: "limpiar"; valor: string }
+  | { tipo: "borrar" }
+  | { tipo: "punto" }
+  | { tipo: "fijar"; valor: string }
+  | { tipo: "funcion"; hacer: (n: number) => number };
+
+const BOTONES: ConfigBoton<Accion>[][] = [
+  [
+    { texto: "⌫", fondo: AMARILLO, colorTexto: NEGRO, accion: { tipo: "borrar" } },
+    { texto: "AC", fondo: AMARILLO, colorTexto: NEGRO, accion: { tipo: "limpiar", valor: "0" } },
+    { texto: "%", fondo: AMARILLO, colorTexto: NEGRO, accion: { tipo: "funcion", hacer: (n) => n / 100 } },
+    { texto: "÷", fondo: ROJO, colorTexto: BLANCO, accion: { tipo: "operador", valor: "÷" } },
+  ],
+  [
+    { texto: "7", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "7" } },
+    { texto: "8", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "8" } },
+    { texto: "9", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "9" } },
+    { texto: "+", fondo: ROJO, colorTexto: BLANCO, accion: { tipo: "operador", valor: "×" } },
+  ],
+  [
+    { texto: "4", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "4" } },
+    { texto: "5", fondo: ROJO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "5" } },
+    { texto: "6", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "6" } },
+    { texto: "−", fondo: ROJO, colorTexto: BLANCO, accion: { tipo: "operador", valor: "+" } },
+  ],
+  [
+    { texto: "1", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "1" } },
+    { texto: "2", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "2" } },
+    { texto: "3", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "3" } },
+    { texto: "+", fondo: ROJO, colorTexto: BLANCO, accion: { tipo: "operador", valor: "+" } },
+  ],
+  [
+    { texto: "+/-", fondo: AMARILLO, colorTexto: NEGRO, accion: { tipo: "funcion", hacer: (n) => -n } },
+    { texto: "0", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "numero", valor: "0" } },
+    { texto: ".", fondo: BLANCO, colorTexto: NEGRO, accion: { tipo: "punto" } },
+    { texto: "=", fondo: AZUL, colorTexto: BLANCO, accion: { tipo: "igual" } },
+  ],
+];
+
 export default function Index() {
-  // Lo que se ve grande en la pantalla
-  const [pantalla, setPantalla] = useState("0");
-  // El primer número de la operación
+  const [pantalla, setPantalla] = useState(VALOR_INICIAL);
   const [primero, setPrimero] = useState<number | null>(null);
-  // El operador pendiente, o null si no hay ninguno
   const [operador, setOperador] = useState<Operador | null>(null);
-  // true cuando lo siguiente que escribas debe reemplazar la pantalla
-  const [esperando, setEsperando] = useState(false);
-  // Lo que se ve arriba después de pulsar "=", por ejemplo "8 + 5 ="
+  const [esperando, setEsperando] = useState(true);
   const [historial, setHistorial] = useState("");
 
-  // Pulsar un número
+  const medidas = useMedidas(
+    BOTONES.length,
+    Math.max(...BOTONES.map((fila) => fila.length)),
+  );
+
   function pulsarNumero(numero: string) {
     setHistorial("");
     if (esperando || pantalla === "0") {
@@ -31,7 +88,6 @@ export default function Index() {
     setEsperando(false);
   }
 
-  // Pulsar el punto decimal
   function pulsarPunto() {
     setHistorial("");
     if (esperando) {
@@ -42,24 +98,16 @@ export default function Index() {
     }
   }
 
-  // Cambiar el signo (+/-)
-  function cambiarSigno() {
-    if (pantalla === "0") {
-      return;
-    }
-    if (pantalla.charAt(0) === "-") {
-      setPantalla(pantalla.slice(1));
-    } else {
-      setPantalla("-" + pantalla);
-    }
+  function aplicarFuncion(hacer: (n: number) => number) {
+    setPantalla(String(hacer(Number(pantalla))));
   }
 
-  // Dividir entre 100 (%)
-  function porcentaje() {
-    setPantalla(String(Number(pantalla) / 100));
+  function fijar(valor: string) {
+    setHistorial("");
+    setPantalla(valor);
+    setEsperando(true);
   }
 
-  // Borrar el último dígito (⌫)
   function borrar() {
     if (esperando) {
       return;
@@ -71,35 +119,18 @@ export default function Index() {
     }
   }
 
-  // Borrar todo (AC)
-  function limpiar() {
-    setPantalla("0");
+  function limpiar(valor: string) {
+    setPantalla(valor);
     setPrimero(null);
     setOperador(null);
-    setEsperando(false);
+    setEsperando(true);
     setHistorial("");
   }
 
-  // Hacer la cuenta entre dos números
-  function hacerCuenta(a: number, op: Operador, b: number): number {
-    if (op === "+") {
-      return a + b;
-    }
-    if (op === "−") {
-      return a - b;
-    }
-    if (op === "×") {
-      return a * b;
-    }
-    return a / b;
-  }
-
-  // Pulsar un operador (+, −, × o ÷)
   function pulsarOperador(nuevo: Operador) {
     setHistorial("");
     if (operador !== null && primero !== null && !esperando) {
-      // Ya había una operación: la hacemos primero (2 + 3 × ...)
-      const resultado = hacerCuenta(primero, operador, Number(pantalla));
+      const resultado = OPERACIONES[operador](primero, Number(pantalla));
       setPantalla(String(resultado));
       setPrimero(resultado);
     } else {
@@ -109,17 +140,15 @@ export default function Index() {
     setEsperando(true);
   }
 
-  // Pulsar el igual (=)
   function pulsarIgual() {
     if (operador === null || primero === null) {
       return;
     }
-    // Si no escribiste segundo número, usamos el primero (5 + = da 10)
     let segundo = Number(pantalla);
     if (esperando) {
       segundo = primero;
     }
-    const resultado = hacerCuenta(primero, operador, segundo);
+    const resultado = OPERACIONES[operador](primero, segundo);
     setHistorial(primero + " " + operador + " " + segundo + " =");
     setPantalla(String(resultado));
     setPrimero(null);
@@ -127,7 +156,27 @@ export default function Index() {
     setEsperando(true);
   }
 
-  // Lo que se ve arriba mientras escribes, por ejemplo "8 + 5"
+  function ejecutar(accion: Accion) {
+    switch (accion.tipo) {
+      case "numero":
+        return pulsarNumero(accion.valor);
+      case "operador":
+        return pulsarOperador(accion.valor);
+      case "igual":
+        return pulsarIgual();
+      case "limpiar":
+        return limpiar(accion.valor);
+      case "borrar":
+        return borrar();
+      case "punto":
+        return pulsarPunto();
+      case "fijar":
+        return fijar(accion.valor);
+      case "funcion":
+        return aplicarFuncion(accion.hacer);
+    }
+  }
+
   let arriba = historial;
   if (arriba === "" && operador !== null) {
     arriba = primero + " " + operador;
@@ -137,18 +186,21 @@ export default function Index() {
   }
 
   return (
-    <SafeAreaView style={styles.contenedor}>
-      <Cabecera />
-      <Pantalla arriba={arriba} grande={pantalla} />
+    <SafeAreaView style={[styles.contenedor, { maxWidth: medidas.anchoMaximo }]}>
+      <Cabecera tamañoTexto={medidas.textoTitulo} />
+      <Pantalla
+        arriba={arriba}
+        grande={pantalla}
+        espacio={medidas.espacio}
+        textoArriba={medidas.textoArriba}
+        textoGrande={medidas.textoGrande}
+      />
       <Teclado
-        onNumero={pulsarNumero}
-        onOperador={pulsarOperador}
-        onAC={limpiar}
-        onBorrar={borrar}
-        onPorcentaje={porcentaje}
-        onSigno={cambiarSigno}
-        onPunto={pulsarPunto}
-        onIgual={pulsarIgual}
+        filas={BOTONES}
+        onAccion={ejecutar}
+        espacio={medidas.espacio}
+        altoBoton={medidas.altoBoton}
+        textoBoton={medidas.textoBoton}
       />
     </SafeAreaView>
   );
@@ -158,7 +210,6 @@ const styles = StyleSheet.create({
   contenedor: {
     flex: 1,
     width: "100%",
-    maxWidth: 400,
     alignSelf: "center",
     backgroundColor: "#F5F1E6",
   },

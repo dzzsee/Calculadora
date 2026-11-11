@@ -1,20 +1,28 @@
 import { StyleSheet, Text, View } from "react-native";
 
-// Componente de presentación: muestra el texto de arriba y el número grande
-// dentro de un globo de cómic con borde negro
 export default function Pantalla({
   arriba,
   grande,
+  espacio,
+  textoArriba,
+  textoGrande,
 }: {
   arriba: string;
   grande: string;
+  espacio: number;
+  textoArriba: number;
+  textoGrande: number;
 }) {
   return (
-    <View style={styles.globo}>
-      <Text style={styles.arriba} numberOfLines={1}>
+    <View style={[styles.globo, { margin: espacio, padding: espacio }]}>
+      <Text style={[styles.arriba, { fontSize: textoArriba }]} numberOfLines={1}>
         {arriba}
       </Text>
-      <Text style={styles.grande} numberOfLines={1} adjustsFontSizeToFit>
+      <Text
+        style={[styles.grande, { fontSize: textoGrande }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
         {grande}
       </Text>
     </View>
@@ -26,8 +34,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "flex-end",
-    margin: 16,
-    padding: 8,
     borderRadius: 28,
     borderWidth: 4,
     borderColor: "#000",
@@ -35,13 +41,11 @@ const styles = StyleSheet.create({
   },
   arriba: {
     color: "#555",
-    fontSize: 18,
     fontWeight: "700",
     marginBottom: 4,
   },
   grande: {
     color: "#000",
-    fontSize: 60,
     fontWeight: "900",
   },
 });
